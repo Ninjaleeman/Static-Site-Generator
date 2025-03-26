@@ -1,6 +1,6 @@
 import unittest
-from node_converter import text_node_to_html_node, text_to_textnodes
-from textnode import TextNode, TextType
+from src.node_converter import text_node_to_html_node, text_to_textnodes, markdown_to_blocks
+from src.textnode import TextNode, TextType
 
 
 class TestNodeConverter(unittest.TestCase):
@@ -113,3 +113,105 @@ class TestTextToTextNode(unittest.TestCase):
         nodes = text_to_textnodes(text)
         self.assertListEqual([TextNode("Link text", TextType.LINK, "https://example.com")], nodes)
 
+
+
+class TestMarkdownToBlocks(unittest.TestCase):
+
+
+
+
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+
+
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+
+
+
+
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+    
+
+    #single block returned correctly
+    def test_single_block(self):
+        md = """# This is a heading"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["# This is a heading"])
+
+
+    #multiple blocks returned correctly
+    def test_multiple_blocks(self):
+        md = """# Heading 1
+
+This is a paragraph.
+
+- List item 1
+- List item 2"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "# Heading 1",
+                "This is a paragraph.",
+                "- List item 1\n- List item 2",
+            ],
+        )
+
+
+    #Extra blank lines are ignored
+    def test_extra_blank_lines(self):
+        md = """# Heading 1
+
+
+This is a paragraph.
+
+
+
+- List item 1
+
+- List item 2"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "# Heading 1",
+                "This is a paragraph.",
+                "- List item 1",
+                "- List item 2",
+            ],
+        )
+
+
+    #handle diffrent indentation
+    def test_mixed_indentation(self):
+        md = """# Heading 1
+
+    This paragraph has leading spaces.
+
+- List item 1
+    - Indented list item"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "# Heading 1",
+                "This paragraph has leading spaces.",
+                "- List item 1\n    - Indented list item",
+            ],
+        )

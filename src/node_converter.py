@@ -1,5 +1,6 @@
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode
+from blocknode import BlockType, block_to_block_type
 from text_processing import *
 
 
@@ -39,3 +40,33 @@ def text_to_textnodes(text):
   new_nodes = split_nodes_link(new_nodes)
 
   return new_nodes
+
+
+
+
+def markdown_to_blocks(markdown):
+  blocks = markdown.split("\n\n")
+  cleaned_blocks = [block.strip() for block in blocks if block.strip()]
+  return cleaned_blocks
+
+
+
+def markdown_to_html_nodes(markdown):
+  blocks = markdown_to_blocks(markdown)
+  html_nodes = []
+
+  for block in blocks:
+    block_type = block_to_block_type(block)
+
+    match block_type:
+      case "paragraph":
+
+      case "heading":
+
+      case "code":
+
+      case "quote":
+
+      case "unordered_list":
+
+      case "ordered_list":
