@@ -9,14 +9,14 @@ class TestHTMLNode(unittest.TestCase):
     htmlnode1 = HTMLNode("p", "lorem ipsom...",None,{"href":"https://www.google.com"})
     self.assertEqual(htmlnode1.tag, "p")
     self.assertEqual(htmlnode1.value, "lorem ipsom...")
-    self.assertEqual(htmlnode1.children, None)
+    self.assertEqual(htmlnode1.children, [])
     self.assertEqual(htmlnode1.props, {"href":"https://www.google.com"})
 
 
 #ensure string rep is accurate
   def test_HTML_repr(self):
     htmlnode1 = HTMLNode("h1","Header",None,{"href":"https://www.youtube.com"})
-    expected_html_repr = "HtmlNode(h1, Header, None, {'href': 'https://www.youtube.com'})"
+    expected_html_repr = "HtmlNode(h1, Header, [], {'href': 'https://www.youtube.com'})"
     self.assertEqual(repr(htmlnode1), expected_html_repr)
 
 
@@ -41,8 +41,8 @@ class TestHTMLNode(unittest.TestCase):
       empty_node = HTMLNode()
       self.assertIsNone(empty_node.tag)
       self.assertIsNone(empty_node.value)
-      self.assertIsNone(empty_node.children)
-      self.assertIsNone(empty_node.props)
+      self.assertEqual(empty_node.children, [])
+      self.assertEqual(empty_node.props, {})
 
 
 if __name__ == "__main__":

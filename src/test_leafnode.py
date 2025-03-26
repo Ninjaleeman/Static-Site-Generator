@@ -7,7 +7,7 @@ class TestLeafNode(unittest.TestCase):
         leaf = LeafNode(tag="p", value="Hello, world!", props={"class": "intro"})
         self.assertEqual(leaf.tag, "p")
         self.assertEqual(leaf.value, "Hello, world!")
-        self.assertEqual(leaf.children, None)  # LeafNode should have no children
+        self.assertEqual(leaf.children, [])  # LeafNode should have no children
         self.assertEqual(leaf.props, {"class": "intro"})
 
     def test_to_html_with_tag_and_props(self):

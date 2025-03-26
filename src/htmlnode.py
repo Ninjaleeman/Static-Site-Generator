@@ -2,8 +2,8 @@ class HTMLNode():
   def __init__(self, tag=None, value=None, children=None, props=None):
     self.tag = tag
     self.value = value
-    self.children = children
-    self.props = props
+    self.children = children if children is not None else []
+    self.props = props if props is not None else {}
 
 
   def to_html(self):
@@ -29,7 +29,7 @@ class HTMLNode():
 
 
 class LeafNode(HTMLNode):
-  def __init__(self, tag=None, value=None, children=None, props=None):
+  def __init__(self, tag=None, value=None, props=None):
     #call parents initializer
     super().__init__(tag=tag, value=value, children=None, props=props)
 
