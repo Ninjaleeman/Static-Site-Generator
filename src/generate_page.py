@@ -1,6 +1,7 @@
-from blocknode import markdown_to_html_node
-from htmlnode import *
 import os
+from pathlib import Path
+from blocknode import markdown_to_html_node
+
 
 def extract_title(markdown):
   lines = markdown.split("\n")
@@ -14,45 +15,39 @@ def extract_title(markdown):
   else:    
     raise Exception("No valid headers")
 
-def generate_files_recursive(source_dir_path, template_path,  dest_dir_path):
-    #does destination directory exists
-    if not os.path.exists(dest_dir_path):
-        os.mkdir(dest_dir_path)
 
-    #open template 
-    with open(template_path, 'r') as file:
-      template = file.read()
+def generate_page(from_path, template_path, dest_path, basepath):
+  print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+#copy mkdown file
+  with open(from_path,'r') as markdown_file:
+    markdown_content = markdown_file.read()
+#copy template
+  with open(template_path, 'r') as template_file:
+    template_content = template_file.read()
+#get title and content
+  title = extract_title(markdown_content)
+  html_content = markdown_to_html_node(markdown_content).to_html()
 
-# list entries in the content dir
-    for filename in os.listdir(source_dir_path):
-      source_path = os.path.join(source_dir_path, filename)
+#new page based on template with content from mkdown file
+  updated_template = template_content.replace('{{ Title }}', title)
+  updated_template = updated_template.replace('{{ Content }}', html_content)
+  updated_template = updated_template.replace('href="/', 'href="' + basepath)
+  updated_template = updated_template.replace('src="/', 'src="' + basepath)
+  # Create directories if they don't exist
+  os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
+  # Write the updated template to the destination file
+  with open(dest_path, 'w') as dest_file:
+      dest_file.write(updated_template)
+      
+    
 
-      if os.path.isfile(source_path):
-        if filename.endswith('.md'):
-          #create dest path with html ext
-          dest_filename = filename[:-3] + '.html' # replacing .md with .html
-          dest_path = os.path.join(dest_dir_path, dest_filename)
-
-          #generate page
-          with open(source_path, 'r') as md_file:
-            md_content = md_file.read()
-
-          #get title and content
-          title = extract_title(md_content)
-          html_content = markdown_to_html_node(md_content).to_html()
-
-         #new page based on template with content from mkdown file
-          updated_template = template.replace('{{ Title }}', title)
-          updated_template = updated_template.replace('{{ Content }}', html_content)
-
-
-          with open(dest_path, 'w') as dest_file:
-              dest_file.write(updated_template)
-
-      #if its a directory call it recursivly
-      else:
-        new_source_dir = source_path
-        new_dest_dir = os.path.join(dest_dir_path, filename)
-        #recursive call
-        generate_files_recursive(new_source_dir, template_path, new_dest_dir)
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
+    for filename in os.listdir(dir_path_content):
+        from_path = os.path.join(dir_path_content, filename)
+        dest_path = os.path.join(dest_dir_path, filename)
+        if os.path.isfile(from_path):
+            dest_path = Path(dest_path).with_suffix(".html")
+            generate_page(from_path, template_path, dest_path, basepath)
+        else:
+            generate_pages_recursive(from_path, template_path, dest_path, basepath)
