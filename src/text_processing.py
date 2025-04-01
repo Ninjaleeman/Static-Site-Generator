@@ -1,5 +1,5 @@
 import re
-from src.textnode import TextType, TextNode
+from textnode import TextType, TextNode
 
 ##############################
 ##     Split Delimiter      ##
